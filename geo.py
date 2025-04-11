@@ -32,14 +32,14 @@ def get_lat_lon(place_name):
         return None, None
 
 # Example
-place_name = "Vancouver, BC"
-lat, lon = get_lat_lon(place_name)
-lat = float(lat)
-lon = float(lon)
-if lat and lon:
-    print(f"Latitude: {lat}, Longitude: {lon}")
-else:
-    print(f"Could not get coordinates for {place_name}.")
+# place_name = "Vancouver, BC"
+# lat, lon = get_lat_lon(place_name)
+# lat = float(lat)
+# lon = float(lon)
+# if lat and lon:
+#     print(f"Latitude: {lat}, Longitude: {lon}")
+# else:
+#     print(f"Could not get coordinates for {place_name}.")
 
 
 def get_specific_amenities(lat, lon, radius=1000):
@@ -91,17 +91,17 @@ def get_specific_amenities(lat, lon, radius=1000):
         return None
 
 # Example 
-lat = 49.2827  # Lat for Vancouver
-lon = -123.1207  # Lon for Vancouver
+# lat = 49.2827  # Lat for Vancouver
+# lon = -123.1207  # Lon for Vancouver
 
-# Get specific amenities within 3 km (3000 meters) of the given coordinates
-amenities = get_specific_amenities(lat, lon, radius=3000)
+# # Get specific amenities within 3 km (3000 meters) of the given coordinates
+# amenities = get_specific_amenities(lat, lon, radius=3000)
 
-if amenities:
-    for amenity in amenities:
-        print(amenity)
-else:
-    print("No amenities found.")
+# if amenities:
+#     for amenity in amenities:
+#         print(amenity)
+# else:
+#     print("No amenities found.")
 
 # Haversine formula to calculate the distance between two points on the Earth
 def haversine(lat1, lon1, lat2, lon2):
@@ -130,12 +130,12 @@ def haversine(lat1, lon1, lat2, lon2):
 # ]
 
 # Calculate distance to each amenity
-for amenity in amenities:
-    amenity_name = amenity['name']
-    amenity_lat = amenity['latitude']
-    amenity_lon = amenity['longitude']
+# for amenity in amenities:
+#     amenity_name = amenity['name']
+#     amenity_lat = amenity['latitude']
+#     amenity_lon = amenity['longitude']
     
-    # Get distance to the house using Haversine formula
-    distance = haversine(lat,lon, amenity_lat, amenity_lon)
+#     # Get distance to the house using Haversine formula
+#     distance = haversine(lat,lon, amenity_lat, amenity_lon)
     
-    print(f"Distance from house to {amenity_name}: {distance:.2f} km")
+#     print(f"Distance from house to {amenity_name}: {distance:.2f} km")
