@@ -91,8 +91,8 @@ def get_specific_amenities(lat, lon, radius=1000):
         return None
 
 # Example 
-# lat = 49.2827  # Lat for Vancouver
-# lon = -123.1207  # Lon for Vancouver
+lat = 49.2827  # Lat for Vancouver
+lon = -123.1207  # Lon for Vancouver
 
 # Get specific amenities within 3 km (3000 meters) of the given coordinates
 amenities = get_specific_amenities(lat, lon, radius=3000)
