@@ -2,6 +2,8 @@ import requests
 import json
 import math
 import os
+from functools import lru_cache
+import numpy as np
 
 CACHE_FILE = 'amenity_cache.json'
 
@@ -105,15 +107,11 @@ def get_specific_amenities(lat, lon, radius=1000):
         print(f"Error fetching amenities: {response.status_code}")
         return None
     
-def get_specific_amenities_cached(lat, lon, radius=3000):
-    key = (round(lat, 4), round(lon, 4))
-
-    if key in amenity_cache:
-        return amenity_cache[key]
+# get_specific_amenities took a long time so we try a cached approach
     
+def get_specific_amenities_uncached(lat, lon, radius=3000):
     overpass_url = "http://overpass-api.de/api/interpreter"
     
-    # Overpass API query to find schools, transportation, convenience stores, grocery stores
     query = f"""
     [out:json];
     (
@@ -129,8 +127,6 @@ def get_specific_amenities_cached(lat, lon, radius=3000):
     
     if response.status_code == 200:
         data = response.json()
-        
-        # List of amenities 
         amenities = []
         
         for element in data['elements']:
@@ -144,12 +140,18 @@ def get_specific_amenities_cached(lat, lon, radius=3000):
                     'latitude': element['lat'] if 'lat' in element else None,
                     'longitude': element['lon'] if 'lon' in element else None
                 }
+                amenities.append(amenity)
         
-        amenity_cache[key] = amenities
         return amenities
     else:
         print(f"Error fetching amenities: {response.status_code}")
         return None
+    
+@lru_cache(maxsize=10000)
+def get_specific_amenities_cached(lat, lon, radius=3000):
+    rounded_lat = round(lat, 4)
+    rounded_lon = round(lon, 4)
+    return get_specific_amenities_uncached(rounded_lat, rounded_lon, radius)
 
 # Example 
 # lat = 49.2827  # Lat for Vancouver
@@ -166,20 +168,22 @@ def get_specific_amenities_cached(lat, lon, radius=3000):
 
 # Haversine formula to calculate the distance between two points on the Earth
 def haversine(lat1, lon1, lat2, lon2):
-    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+    lat1 = np.radians(lat1)
+    lon1 = np.radians(lon1)
+    lat2 = np.radians(np.array(lat2))
+    lon2 = np.radians(np.array(lon2))
     
-    # Haversine formula
+    #Haversine Formula
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    
-    # Radius of Earth in kilometers (can change to miles by using 3958.8)
+    a = np.sin(dlat / 2.0)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1-a))
+
+    # Radius of earth (in km)
     R = 6371.0
-    
-    # Distance in kilometers
-    distance = R * c
-    return distance
+
+    # Distance (in km)
+    return R * c
 
 
 # Example of amenities data (list of amenities with their lat, lon, and name)
