@@ -1,5 +1,20 @@
 import requests
+import json
 import math
+import os
+
+CACHE_FILE = 'amenity_cache.json'
+
+if os.path.exists(CACHE_FILE):
+    with open(CACHE_FILE, 'r') as file:
+        raw = json.load(file)
+        amenity_cache = {eval(k): v for k, v in raw.items()}
+else:
+    amenity_cache = {}
+
+def save_cache():
+    with open(CACHE_FILE, 'w') as f:
+        json.dump({str(k): v for k, v in amenity_cache.items()}, f)
 
 def get_lat_lon(place_name):
     # URL encode the place name to handle spaces and special characters
@@ -32,14 +47,14 @@ def get_lat_lon(place_name):
         return None, None
 
 # Example
-place_name = "Vancouver, BC"
-lat, lon = get_lat_lon(place_name)
-lat = float(lat)
-lon = float(lon)
-if lat and lon:
-    print(f"Latitude: {lat}, Longitude: {lon}")
-else:
-    print(f"Could not get coordinates for {place_name}.")
+# place_name = "Vancouver, BC"
+# lat, lon = get_lat_lon(place_name)
+# lat = float(lat)
+# lon = float(lon)
+# if lat and lon:
+#     print(f"Latitude: {lat}, Longitude: {lon}")
+# else:
+#     print(f"Could not get coordinates for {place_name}.")
 
 
 def get_specific_amenities(lat, lon, radius=1000):
@@ -89,19 +104,65 @@ def get_specific_amenities(lat, lon, radius=1000):
     else:
         print(f"Error fetching amenities: {response.status_code}")
         return None
+    
+def get_specific_amenities_cached(lat, lon, radius=3000):
+    key = (round(lat, 4), round(lon, 4))
+
+    if key in amenity_cache:
+        return amenity_cache[key]
+    
+    overpass_url = "http://overpass-api.de/api/interpreter"
+    
+    # Overpass API query to find schools, transportation, convenience stores, grocery stores
+    query = f"""
+    [out:json];
+    (
+      node["amenity"="school"](around:{radius},{lat},{lon});
+      node["amenity"="university"](around:{radius},{lat},{lon});
+      node["amenity"="bus_station"](around:{radius},{lat},{lon});
+      node["shop"="convenience"](around:{radius},{lat},{lon});
+      node["shop"="grocery"](around:{radius},{lat},{lon});
+    );
+    out body;
+    """
+    response = requests.get(overpass_url, params={'data': query})
+    
+    if response.status_code == 200:
+        data = response.json()
+        
+        # List of amenities 
+        amenities = []
+        
+        for element in data['elements']:
+            if 'tags' in element:
+                amenity = {
+                    'type': element.get('type'),
+                    'id': element.get('id'),
+                    'name': element['tags'].get('name', 'N/A'),
+                    'amenity': element['tags'].get('amenity', 'N/A'),
+                    'shop': element['tags'].get('shop', 'N/A'),
+                    'latitude': element['lat'] if 'lat' in element else None,
+                    'longitude': element['lon'] if 'lon' in element else None
+                }
+        
+        amenity_cache[key] = amenities
+        return amenities
+    else:
+        print(f"Error fetching amenities: {response.status_code}")
+        return None
 
 # Example 
-lat = 49.2827  # Lat for Vancouver
-lon = -123.1207  # Lon for Vancouver
+# lat = 49.2827  # Lat for Vancouver
+# lon = -123.1207  # Lon for Vancouver
 
-# Get specific amenities within 3 km (3000 meters) of the given coordinates
-amenities = get_specific_amenities(lat, lon, radius=3000)
+# # Get specific amenities within 3 km (3000 meters) of the given coordinates
+# amenities = get_specific_amenities(lat, lon, radius=3000)
 
-if amenities:
-    for amenity in amenities:
-        print(amenity)
-else:
-    print("No amenities found.")
+# if amenities:
+#     for amenity in amenities:
+#         print(amenity)
+# else:
+#     print("No amenities found.")
 
 # Haversine formula to calculate the distance between two points on the Earth
 def haversine(lat1, lon1, lat2, lon2):
@@ -130,12 +191,12 @@ def haversine(lat1, lon1, lat2, lon2):
 # ]
 
 # Calculate distance to each amenity
-for amenity in amenities:
-    amenity_name = amenity['name']
-    amenity_lat = amenity['latitude']
-    amenity_lon = amenity['longitude']
+# for amenity in amenities:
+#     amenity_name = amenity['name']
+#     amenity_lat = amenity['latitude']
+#     amenity_lon = amenity['longitude']
     
-    # Get distance to the house using Haversine formula
-    distance = haversine(lat,lon, amenity_lat, amenity_lon)
+#     # Get distance to the house using Haversine formula
+#     distance = haversine(lat,lon, amenity_lat, amenity_lon)
     
-    print(f"Distance from house to {amenity_name}: {distance:.2f} km")
+#     print(f"Distance from house to {amenity_name}: {distance:.2f} km")
