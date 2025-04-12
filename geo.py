@@ -81,6 +81,7 @@ def get_specific_amenities(lat, lon, radius=1000):
     #   node["amenity"="subway_station"](around:{radius},{lat},{lon});
     #   node["amenity"="railway_station"](around:{radius},{lat},{lon});
     # node["amenity"="fast_food"](around:{radius},{lat},{lon});
+
     response = requests.get(overpass_url, params={'data': query})
     
     if response.status_code == 200:
@@ -185,7 +186,6 @@ def haversine(lat1, lon1, lat2, lon2):
     # Distance (in km)
     return R * c
 
-
 # Example of amenities data (list of amenities with their lat, lon, and name)
 # amenities = [
 #     {'name': 'Vancouver High School', 'latitude': 49.2835, 'longitude': -123.121},
@@ -199,8 +199,8 @@ def haversine(lat1, lon1, lat2, lon2):
 #     amenity_name = amenity['name']
 #     amenity_lat = amenity['latitude']
 #     amenity_lon = amenity['longitude']
-    
+
 #     # Get distance to the house using Haversine formula
 #     distance = haversine(lat,lon, amenity_lat, amenity_lon)
-    
+
 #     print(f"Distance from house to {amenity_name}: {distance:.2f} km")
