@@ -151,7 +151,7 @@ X = data_filtered[[
                 # 'price',
                 'property-beds',
                 'property-baths',
-                # 'property-sqft',
+                'property-sqft',
                 'Garage',
                 'Property Type',
                 'avg_convenience_dist',
@@ -176,3 +176,33 @@ plt.ylabel('Coefficient Value ($ Impact)')
 plt.axhline(0, color='gray', linestyle='--')
 plt.grid(True, axis='y')
 plt.savefig('feature_significance.svg')
+
+X = data_filtered[[
+                # 'price',
+                'property-beds',
+                'property-baths',
+                # 'property-sqft',
+                'Garage',
+                'Property Type',
+                'avg_convenience_dist',
+                'avg_transit_distance',
+                'avg_school_distance',
+                # 'Price-to-income Ratio'
+                ]]
+X = sm.add_constant(X)
+y = data_filtered['price']
+
+model = sm.OLS(y, X).fit()
+coefficients = model.params.drop('const')
+errors = model.bse.drop('const')
+model_summary = model.summary()
+
+print(model_summary)
+
+plt.figure(figsize=(12, 6))
+coefficients.plot(kind='bar', yerr=errors, capsize=5, color='blue')
+plt.title('Feature Significane on House Price (OLS)')
+plt.ylabel('Coefficient Value ($ Impact)')
+plt.axhline(0, color='gray', linestyle='--')
+plt.grid(True, axis='y')
+plt.savefig('feature_significance_minus_sqft.svg')
