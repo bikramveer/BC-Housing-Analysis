@@ -35,8 +35,6 @@ pip install pandas numpy matplotlib seaborn requests statsmodels scikit-learn
   - **amenities_distances.csv**: distances per property to amenities (precomputed)
   - **CensusProfile2021.csv**: Census income data
 
-  ---
-
  You can then run the script from the terminal using:
 
  ```bash
@@ -47,3 +45,37 @@ pip install pandas numpy matplotlib seaborn requests statsmodels scikit-learn
   python3 project.py data_bc.csv amenities_distances.csv CensusProfile2021.csv
  ```
  depending on your installe python version
+
+---
+
+## Output Files
+
+Once you have completed running the script, you will be able to see the following output files in your folder:
+ - **data.csv** - Cleaned data with all included features
+ - **distribution.svg** - Boxplot showing the spread of scores across cities
+ - **distribution_sorted.svg** - Boxplot sorted by median score per city
+ - **feature_significance.svg** - Bar chart of feature coefficients from our regression model
+ - **feature_significance_minus_sqft.svg** - Same as above but without the square footage bar
+
+You should also see 2 OLS Regression Results outputted to your terminal. The first will be for the feature significance including 'property-sqft' and the second for feature significance without 'property-sqft'. We exclude 'property-sqft' from the second to get a more detailed comparison of the other features.
+
+---
+
+## Annotated Notebook
+
+Yoou can also view the main workflow and code explanation in the included juypter notebook:
+ - **annotated_notebook.ipynb** - inline notes and insights included
+
+---
+
+## Notes
+
+ - If you'd like to rerun amenity distance calculations, make sure your Overpass API acces is not rate-limited and that ```geo.py``` includes caching (```amenity_cache.json```) to avoid redundant requests.
+
+  - ```amenities_distances.csv``` can be regenerated using the cached API responses for speed and efficiency.
+
+---
+
+## Contact
+
+Please feel free to reach out to any of our team members ifyou have questions or issues!

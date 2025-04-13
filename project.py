@@ -41,7 +41,6 @@ metro_vancouver_cities = [
     "Delta", "Port Coquitlam", "Port Moody", "Langley"
 ]
 data_filtered = data_filtered[data_filtered['addressLocality'].isin(metro_vancouver_cities)]
-data_filtered.to_csv('data.csv')
 
 lat_lon_array = data_filtered[['latitude', 'longitude']].to_numpy()
 
@@ -102,6 +101,7 @@ data_filtered['avg_school_distance'] = 1 - data_filtered['avg_school_distance']
 
 data_filtered[features] = scaler.fit_transform(data_filtered[features])
 data_filtered = data_filtered.dropna()
+data_filtered.to_csv('data.csv')
 
 score_features = [
             'price',
