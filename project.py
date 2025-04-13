@@ -41,7 +41,6 @@ metro_vancouver_cities = [
     "Delta", "Port Coquitlam", "Port Moody", "Langley"
 ]
 data_filtered = data_filtered[data_filtered['addressLocality'].isin(metro_vancouver_cities)]
-data_filtered.to_csv('data.csv')
 
 lat_lon_array = data_filtered[['latitude', 'longitude']].to_numpy()
 
@@ -102,6 +101,7 @@ data_filtered['avg_school_distance'] = 1 - data_filtered['avg_school_distance']
 
 data_filtered[features] = scaler.fit_transform(data_filtered[features])
 data_filtered = data_filtered.dropna()
+data_filtered.to_csv('data.csv')
 
 score_features = [
             'price',
@@ -151,7 +151,7 @@ X = data_filtered[[
                 # 'price',
                 'property-beds',
                 'property-baths',
-                # 'property-sqft',
+                'property-sqft',
                 'Garage',
                 'Property Type',
                 'avg_convenience_dist',
@@ -176,3 +176,33 @@ plt.ylabel('Coefficient Value ($ Impact)')
 plt.axhline(0, color='gray', linestyle='--')
 plt.grid(True, axis='y')
 plt.savefig('feature_significance.svg')
+
+X = data_filtered[[
+                # 'price',
+                'property-beds',
+                'property-baths',
+                # 'property-sqft',
+                'Garage',
+                'Property Type',
+                'avg_convenience_dist',
+                'avg_transit_distance',
+                'avg_school_distance',
+                # 'Price-to-income Ratio'
+                ]]
+X = sm.add_constant(X)
+y = data_filtered['price']
+
+model = sm.OLS(y, X).fit()
+coefficients = model.params.drop('const')
+errors = model.bse.drop('const')
+model_summary = model.summary()
+
+print(model_summary)
+
+plt.figure(figsize=(12, 6))
+coefficients.plot(kind='bar', yerr=errors, capsize=5, color='blue')
+plt.title('Feature Significane on House Price (OLS)')
+plt.ylabel('Coefficient Value ($ Impact)')
+plt.axhline(0, color='gray', linestyle='--')
+plt.grid(True, axis='y')
+plt.savefig('feature_significance_minus_sqft.svg')
